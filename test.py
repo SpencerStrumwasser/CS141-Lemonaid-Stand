@@ -1,16 +1,20 @@
 import pygame as pg
 import random
+import time
 
 questions = [ 
-            [["pics/bg.png", 4],["pics/farm.png", 240]],
-            [["pics/bg.png", 4],["pics/farm.png", 240]],
-            [["pics/farm.png", 240],["bg.png", 4]],
-            [["pics/bg.png", 4],["pics/farm.png", 240]],
-            [["pics/farm.png", 240],["pics/bg.png", 4]]
+            [["pics/bg.png", 4],["pics/farm2.png", 240]],
+            [["pics/cityblock.png", 4],["pics/farm2.png", 240]],
+            [["pics/farm2.png", 240],["pics/bg.png", 4]],
+            [["pics/bg.png", 4],["pics/farm2.png", 240]],
+            [["pics/farm2.png", 240],["pics/bg.png", 4]]
             ]
 
 
 pg.init()
+pg.font.init()
+myfont = pg.font.SysFont('Comic Sans MS', 30)
+myfontquest = pg.font.SysFont('Comic Sans MS', 25)
 screen = pg.display.set_mode((640, 480))
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
@@ -63,6 +67,61 @@ class InputBox:
 
 
 
+
+class LemonadeStand:
+
+    """ LemonadeStand class with three methods - make_lemonade, sell_lemonade, display_data.
+    """
+
+    def __init__(self):
+        """ setup initial parameters. weather is randomized."""
+        self.day = 0
+        self.cash = 0
+        self.lemonade = 1
+        self.weather = random.randrange(50, 100)
+        self.questions = 1
+        self.first = 1
+
+        
+        
+
+    def sell_lemonade(self, price):
+        """ Sell lemonade that you have made previously. Bad weather and/or high price will discount net demand. """
+        try:
+            price = int(price)
+        except ValueError:
+            price = 10
+        cups = random.randrange(1, 101)  # without heat or price factors, will sell 1-100 cups per day
+        price_factor = float(100 - price) / 100  # 10% less demand for each ten cent price increase
+        heat_factor = 1 - (((100 - self.weather) * 2) / float(100))  # 20% less demand for each 10 degrees below 100
+        if price == 0:
+            self.lemonade = 0  # If you set price to zero, all your lemonade sells, for nothing.
+            print('All of your lemonade sold for nothing because you set the price to zero.')
+            self.day += 1
+            self.weather = random.randrange(50, 100)
+        demand = int(round(cups * price_factor * heat_factor))
+        if demand > self.lemonade:
+            print(
+                'You only have ' + str(self.lemonade) + ' cups of lemonade, but there was demand for ' + str(
+                    demand) + '.')
+            demand = self.lemonade
+        revenue = demand * round((float(price) / 100), 2)
+        self.lemonade -= demand
+        self.cash += revenue
+        self.day += 1
+        self.weather = random.randrange(50, 100)
+        print('You sold ' + str(demand) + ' cup(s) of lemonade and earned $' + str(revenue) + ' dollars!\n')
+
+
+
+
+
+
+
+
+
+
+
 def main():
     bg = pg.image.load("pics/lemonade.png").convert()
     done = False
@@ -72,7 +131,7 @@ def main():
     i = 0
     j = 0
     appear = True
-    lemons = 0
+    stand = LemonadeStand()
     while not done:
 
     	screen.blit(bg, (0, 0))
@@ -92,13 +151,17 @@ def main():
                 	pos = pg.mouse.get_pos()
                 	if b.collidepoint(pos):
                 		print "hi"
-                output =input_box.handle_event(event)
+                output = input_box.handle_event(event)
 
             	
             if output != None:
-                if int(output) == questions[x[i]][j][1]:
-                    lemons += 5
-                    print "lemons: " + str(lemons)
+                try:
+                    output = int(output)
+                except ValueError:
+                    pass
+                if output == questions[x[i]][j][1]:
+                    stand.lemonade += 5
+                    print "lemons: " + str(stand.lemonade)
                 if j == 0:
                     j = 1
                     bg = pg.image.load(questions[x[i]][j][0]).convert()
@@ -106,36 +169,49 @@ def main():
                     j = 0
                     i+=1
                     lemonadestand = True
+                    appear = True
                     bg = pg.image.load("pics/lemonade.png").convert()
             	print output
                 output = None
             input_box.update()
-
-            # screen.fill((30, 30, 30))
             input_box.draw(screen)
             pg.display.flip()
             pg.display.update()
 
         else:
             if appear:
-                cont = pg.image.load('pics/cont.png').convert()
-                cont = pg.transform.scale(cont, (125,75))
-                appear = False
-            c = screen.blit(cont, (0, 400))   
+                textday = myfont.render('Day: ' + str(stand.day), False, (0, 0, 0))
+                textcash = myfont.render('Cash: ' + str(stand.cash), False, (0, 0, 0))
+                textweather = myfont.render('Weather: ' + str(stand.weather), False, (0, 0, 0))
+                textlemonade = myfont.render('Lemonade: ' + str(stand.lemonade), False, (0, 0, 0))
+                textquestion1 = myfontquest.render('Enter the price you will sell', False, (0, 0, 0))
+                textquestion2 = myfontquest.render('your lemonade for (in cents)', False, (0, 0, 0))
+                input_box = InputBox(200, 440, 240, 32)
+                appear = False 
+            screen.blit(textday,(0,200))
+            screen.blit(textweather,(0,240))
+            screen.blit(textlemonade,(0,280)) 
+            screen.blit(textcash,(0,320)) 
+            screen.blit(textquestion1,(195,370))
+            screen.blit(textquestion2,(195,400))
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
-                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                    pos = pg.mouse.get_pos()
-                    if c.collidepoint(pos):
-                        lemonadestand = False
-                        appear = True
-                        if i < 5:
-                            bg = pg.image.load(questions[x[i]][0][0]).convert()
-                        else:
-                            print lemons
-                            done = True
+                output = input_box.handle_event(event)
 
+            if output != None:
+                stand.sell_lemonade(output)
+                lemonadestand = False
+                appear = True
+                if i < 5:
+                    bg = pg.image.load(questions[x[i]][0][0]).convert()
+                else:
+                    print stand.lemonade
+                    done = True
+                output = None
+
+            input_box.update()
+            input_box.draw(screen)
             pg.display.flip()
             pg.display.update()
 if __name__ == '__main__':
