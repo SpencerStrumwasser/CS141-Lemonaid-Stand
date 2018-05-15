@@ -1,0 +1,6 @@
+-results window for how many lemonades you sold (resutls for sellgin)
+- correct/incorrect for each problem, and how many lemons they got (results for solving)
+-UI for all the problems
+-Display the hints 
+(everything works in terminal)
+(integrate the games)
