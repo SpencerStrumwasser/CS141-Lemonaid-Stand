@@ -43,21 +43,21 @@ def print_score(score):
     message_display('Score: '+str(score), black, (80, display_height-20))
 
 def paint_box(x, y, x_width, y_width): 
-    rb_img = pygame.image.load('img/redbrush.png').convert()
+    rb_img = pygame.image.load('pics/redbrush.png').convert()
     rb_size = rb_img.get_size() 
     redbrush = pygame.transform.scale(rb_img, (int(rb_size[0]*0.5), int(rb_size[1]*0.5)))
     pygame.draw.rect(gameDisplay, red, [x, y, x_width, y_width])
     display(redbrush, x+4, y+4)
 
 def shopping_cart(x, y, x_width, y_width): 
-    sc_img = pygame.image.load('img/shopping_cart.png').convert() 
+    sc_img = pygame.image.load('pics/shopping_cart.png').convert() 
     sc_size = sc_img.get_size()
     shopcart = pygame.transform.scale(sc_img, (int(sc_size[0]*0.2), int(sc_size[1]*0.2))) 
     pygame.draw.rect(gameDisplay, black, [x, y, x_width, y_width])
     display(shopcart, x+4, y+4)
 
 def door(x, y): 
-    door_img = pygame.image.load('img/door.png').convert()
+    door_img = pygame.image.load('pics/door.png').convert()
     door_size = door_img.get_size()
     door = pygame.transform.scale(door_img, (int(door_size[0]*0.5), int(door_size[1]*0.5)))
     display(door, x, y)
@@ -140,8 +140,8 @@ if __name__ == '__main__':
     gameDisplay = pygame.display.set_mode((display_width,display_height))
     pygame.display.set_caption('Painting a House')
 
-    s1_img = pygame.image.load('img/sprite1.png').convert()
-    # s1_img = pygame.image.load('img/sprite2.gif').convert()
+    s1_img = pygame.image.load('pics/sprite1.png').convert()
+    # s1_img = pygame.image.load('pics/sprite2.gif').convert()
     s1_size = s1_img.get_size() 
     sprite1 = pygame.transform.scale(s1_img, (int(s1_size[0]*0.2), int(s1_size[1]*0.2)))
 

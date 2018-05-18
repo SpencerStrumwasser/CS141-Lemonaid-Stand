@@ -2,6 +2,12 @@ import pygame as pg
 import random
 import time
 
+black = (0,0,0)
+white = (255,255,255)
+red = (255, 0, 0)
+blue = (0, 0, 255)
+green = (0, 255, 0)
+
 questions = [ 
             [["pics/bg.png", 4],["pics/farm2.png", 240]],
             [["pics/cityblock.png", 4],["pics/farm2.png", 240]],
@@ -20,6 +26,21 @@ COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
 FONT = pg.font.Font(None, 32)
 
+prize = pg.image.load('pics/prize.png').convert_alpha()
+success = pg.image.load("pics/back3.jpg").convert()
+
+def text_objects(text, font, color):
+    textSurface = font.render(text, True, color)
+    return textSurface, textSurface.get_rect()
+
+def message_display(text, color, loc=(640*0.4, 40)):
+    largeText = pg.font.Font('freesansbold.ttf',40)
+    TextSurf, TextRect = text_objects(text, largeText, color)
+    TextRect.center = loc
+    screen.blit(TextSurf, TextRect)
+    # pg.display.update()
+    # time.sleep(2)
+    return
 
 class InputBox:
 
@@ -114,16 +135,27 @@ class LemonadeStand:
 
 
 
-
-
-
-
-
-
+def disp_success(num):
+    screen.blit(success, (0, 0))
+    screen.blit(prize, (240, 180))
+    message_display('You got it right!', white)
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1000)
+    
+    message_display('Rewards:            x5', white, (200, 400))
+    lemon_img = pg.image.load('pics/lemon1.png').convert_alpha() 
+    lemon_sz = lemon_img.get_size()
+    lemons = pg.transform.scale(lemon_img, (int(lemon_sz[0]*0.08), int(lemon_sz[1]*0.08)))
+    screen.blit(lemons, (220, 340))
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1500)
 
 
 def main():
     bg = pg.image.load("pics/lemonade.png").convert()
+    # testing 
     done = False
     lemonadestand = True
     output = None
@@ -160,8 +192,12 @@ def main():
                 except ValueError:
                     pass
                 if output == questions[x[i]][j][1]:
-                    stand.lemonade += 5
+                    rewards = 5
+                    stand.lemonade += rewards
                     print "lemons: " + str(stand.lemonade)
+                    # testing
+                    
+                    disp_success(rewards)
                 if j == 0:
                     j = 1
                     bg = pg.image.load(questions[x[i]][j][0]).convert()
