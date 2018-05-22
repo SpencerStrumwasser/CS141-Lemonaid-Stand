@@ -28,6 +28,7 @@ FONT = pg.font.Font(None, 32)
 
 prize = pg.image.load('pics/prize.png').convert_alpha()
 success = pg.image.load("pics/back3.jpg").convert()
+lemonsold = pg.image.load("pics/lemonsold.png").convert()
 
 def text_objects(text, font, color):
     textSurface = font.render(text, True, color)
@@ -41,6 +42,9 @@ def message_display(text, color, loc=(640*0.4, 40)):
     # pg.display.update()
     # time.sleep(2)
     return
+
+
+
 
 class InputBox:
 
@@ -132,7 +136,7 @@ class LemonadeStand:
         self.day += 1
         self.weather = random.randrange(50, 100)
         print('You sold ' + str(demand) + ' cup(s) of lemonade and earned $' + str(revenue) + ' dollars!\n')
-
+        return demand
 
 
 def disp_success(num):
@@ -148,6 +152,41 @@ def disp_success(num):
     lemon_sz = lemon_img.get_size()
     lemons = pg.transform.scale(lemon_img, (int(lemon_sz[0]*0.08), int(lemon_sz[1]*0.08)))
     screen.blit(lemons, (220, 340))
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1500)
+
+
+
+def disp_failure():
+    screen.blit(success, (0, 0))
+    message_display('You got it wrong', white)
+    
+    
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1000)
+
+    message_display('Better luck next time', white, (300, 300))
+    
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1500)
+
+def disp_lemons(numsold, cash):
+    screen.blit(lemonsold, (0, 0))
+    if numsold > 1:
+        message_display('Congrats you sold ' + str(numsold) + ' lemons', blue, (300, 50))
+    elif numsold == 1:
+        message_display('Congrats you sold ' + str(numsold) + ' lemon', blue, (300, 50))
+    else:
+        message_display("Oh no, you sold no lemonade today", blue, (300, 50))
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(1000)
+
+    message_display('You earned ' + str(cash) + ' dollars', blue, (300, 300))
+    
     pg.display.flip()
     pg.display.update()
     pg.time.delay(1500)
@@ -198,6 +237,8 @@ def main():
                     # testing
                     
                     disp_success(rewards)
+                else:
+                    disp_failure()
                 if j == 0:
                     j = 1
                     bg = pg.image.load(questions[x[i]][j][0]).convert()
@@ -207,7 +248,6 @@ def main():
                     lemonadestand = True
                     appear = True
                     bg = pg.image.load("pics/lemonade.png").convert()
-            	print output
                 output = None
             input_box.update()
             input_box.draw(screen)
@@ -218,7 +258,7 @@ def main():
             if appear:
                 textday = myfont.render('Day: ' + str(stand.day), False, (0, 0, 0))
                 textcash = myfont.render('Cash: ' + str(stand.cash), False, (0, 0, 0))
-                textweather = myfont.render('Weather: ' + str(stand.weather), False, (0, 0, 0))
+                textweather = myfont.render('Degrees: ' + str(stand.weather), False, (0, 0, 0))
                 textlemonade = myfont.render('Lemonade: ' + str(stand.lemonade), False, (0, 0, 0))
                 textquestion1 = myfontquest.render('Enter the price you will sell', False, (0, 0, 0))
                 textquestion2 = myfontquest.render('your lemonade for (in cents)', False, (0, 0, 0))
@@ -236,7 +276,10 @@ def main():
                 output = input_box.handle_event(event)
 
             if output != None:
-                stand.sell_lemonade(output)
+                current_cash = stand.cash
+                lemons_sold = stand.sell_lemonade(output)
+                cash_made = stand.cash - current_cash
+                disp_lemons(lemons_sold, cash_made)
                 lemonadestand = False
                 appear = True
                 if i < 5:
