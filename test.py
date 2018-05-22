@@ -8,9 +8,11 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 green = (0, 255, 0)
 
+f= open("datacollection.txt","w+")
+
 questions = [ 
             [["pics/bg.png", 4],["pics/farm2.png", 240]],
-            [["pics/cityblock.png", 4],["pics/farm2.png", 240]],
+            [["pics/cityblock.png", 5],["pics/school.jpg", 8]],
             [["pics/farm2.png", 240],["pics/bg.png", 4]],
             [["pics/bg.png", 4],["pics/farm2.png", 240]],
             [["pics/farm2.png", 240],["pics/bg.png", 4]]
@@ -43,7 +45,14 @@ def message_display(text, color, loc=(640*0.4, 40)):
     # time.sleep(2)
     return
 
-
+def message_displaysmall(text, color, loc=(640*0.4, 40)):
+    largeText = pg.font.Font('freesansbold.ttf',20)
+    TextSurf, TextRect = text_objects(text, largeText, color)
+    TextRect.center = loc
+    screen.blit(TextSurf, TextRect)
+    # pg.display.update()
+    # time.sleep(2)
+    return
 
 
 class InputBox:
@@ -102,7 +111,7 @@ class LemonadeStand:
         """ setup initial parameters. weather is randomized."""
         self.day = 0
         self.cash = 0
-        self.lemonade = 1
+        self.lemonade = 10
         self.weather = random.randrange(50, 100)
         self.questions = 1
         self.first = 1
@@ -118,6 +127,8 @@ class LemonadeStand:
             price = 10
         cups = random.randrange(1, 101)  # without heat or price factors, will sell 1-100 cups per day
         price_factor = float(100 - price) / 100  # 10% less demand for each ten cent price increase
+        if price_factor < 0:
+            price_factor = 0
         heat_factor = 1 - (((100 - self.weather) * 2) / float(100))  # 20% less demand for each 10 degrees below 100
         if price == 0:
             self.lemonade = 0  # If you set price to zero, all your lemonade sells, for nothing.
@@ -148,6 +159,7 @@ def disp_success(num):
     pg.time.delay(1000)
     
     message_display('Rewards:            x5', white, (200, 400))
+    message_displaysmall('Each Lemon Makes 3-5 cups of Lemonade!!', white, (250, 450))
     lemon_img = pg.image.load('pics/lemon1.png').convert_alpha() 
     lemon_sz = lemon_img.get_size()
     lemons = pg.transform.scale(lemon_img, (int(lemon_sz[0]*0.08), int(lemon_sz[1]*0.08)))
@@ -176,11 +188,14 @@ def disp_failure():
 def disp_lemons(numsold, cash):
     screen.blit(lemonsold, (0, 0))
     if numsold > 1:
-        message_display('Congrats you sold ' + str(numsold) + ' lemons', blue, (300, 50))
+        message_display('Congrats you sold ' + str(numsold), blue, (300, 50))
+        message_display('cups of lemonades', blue, (300, 100))
     elif numsold == 1:
-        message_display('Congrats you sold ' + str(numsold) + ' lemon', blue, (300, 50))
+        message_display('Congrats you sold ' + str(numsold), blue, (300, 50))
+        message_display('cup of lemonade', blue, (300, 100))
     else:
-        message_display("Oh no, you sold no lemonade today", blue, (300, 50))
+        message_display("Oh no, you sold", blue, (300, 50)) 
+        message_display("no lemonade today", blue, (300, 100))
     pg.display.flip()
     pg.display.update()
     pg.time.delay(1000)
@@ -232,13 +247,15 @@ def main():
                     pass
                 if output == questions[x[i]][j][1]:
                     rewards = 5
-                    stand.lemonade += rewards
+                    for i in range(rewards):
+                        stand.lemonade += random.randint(3,5)
                     print "lemons: " + str(stand.lemonade)
                     # testing
-                    
+                    f.write(str(x[i]) + str(j) + " Correct \n")
                     disp_success(rewards)
                 else:
                     disp_failure()
+                    f.write(str(x[i]) + str(j) + "Wrong\n")
                 if j == 0:
                     j = 1
                     bg = pg.image.load(questions[x[i]][j][0]).convert()
