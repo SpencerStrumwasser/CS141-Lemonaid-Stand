@@ -11,11 +11,11 @@ green = (0, 255, 0)
 f= open("datacollection.txt","w+")
 
 questions = [ 
-            [["pics/bg.png", 4],["pics/farm2.png", 240]],
-            [["pics/cityblock.png", 5],["pics/school.jpg", 8]],
-            [["pics/farm2.png", 240],["pics/bg.png", 4]],
-            [["pics/bg.png", 4],["pics/farm2.png", 240]],
-            [["pics/farm2.png", 240],["pics/bg.png", 4]]
+            [["pics/bg.png","pics/bg.png", 4],["pics/farm2.png","pics/bg.png", 240]],
+            [["pics/cityblock.png","pics/bg.png", 5],["pics/school.jpg","pics/bg.png", 8]],
+            [["pics/cups2.png","pics/bg.png", 1/15.],["pics/bg.png","pics/bg.png", 1./15]],
+            [["pics/bg.png","pics/bg.png", 4],["pics/farm2.png","pics/bg.png", 240]],
+            [["pics/farm2.png","pics/bg.png", 240],["pics/bg.png","pics/bg.png", 4]]
             ]
 
 
@@ -207,6 +207,16 @@ def disp_lemons(numsold, cash):
     pg.time.delay(1500)
 
 
+
+def disp_end(cash):
+    screen.blit(pg.image.load("pics/end.png").convert(), (0, 0))
+    message_display('You earned ' + str(cash) + ' dollars', blue, (300, 50))
+
+    pg.display.flip()
+    pg.display.update()
+    pg.time.delay(5000)
+
+
 def main():
     bg = pg.image.load("pics/lemonade.png").convert()
     # testing 
@@ -218,10 +228,15 @@ def main():
     j = 0
     appear = True
     stand = LemonadeStand()
+    hint = 0
     while not done:
 
-    	screen.blit(bg, (0, 0))
-    	
+        if i == 5:
+            disp_end(stand.cash)
+            break
+
+        screen.blit(bg, (0, 0))
+        
 
         if not lemonadestand:
             if appear:
@@ -234,20 +249,23 @@ def main():
                 if event.type == pg.QUIT:
                     done = True
                 if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                	pos = pg.mouse.get_pos()
-                	if b.collidepoint(pos):
-                		print "hi"
+                    pos = pg.mouse.get_pos()
+                    if b.collidepoint(pos):
+                        hint += 1  
+                        bg = pg.image.load(questions[x[i]][j][hint%2]).convert()
                 output = input_box.handle_event(event)
 
-            	
+                
             if output != None:
                 try:
-                    output = int(output)
-                except ValueError:
+                    if len(output):
+                        output += "."
+                        output = eval(output)
+                except SyntaxError:
                     pass
-                if output == questions[x[i]][j][1]:
+                if output == questions[x[i]][j][2]:
                     rewards = 5
-                    for i in range(rewards):
+                    for rew in range(rewards):
                         stand.lemonade += random.randint(3,5)
                     print "lemons: " + str(stand.lemonade)
                     # testing
@@ -258,12 +276,14 @@ def main():
                     f.write(str(x[i]) + str(j) + "Wrong\n")
                 if j == 0:
                     j = 1
+                    hint = 0
                     bg = pg.image.load(questions[x[i]][j][0]).convert()
                 else:
                     j = 0
                     i+=1
                     lemonadestand = True
                     appear = True
+                    hint = 0
                     bg = pg.image.load("pics/lemonade.png").convert()
                 output = None
             input_box.update()
@@ -300,6 +320,7 @@ def main():
                 lemonadestand = False
                 appear = True
                 if i < 5:
+                    hint = 0
                     bg = pg.image.load(questions[x[i]][0][0]).convert()
                 else:
                     print stand.lemonade
