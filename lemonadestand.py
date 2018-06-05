@@ -132,21 +132,21 @@ class LemonadeStand:
         heat_factor = 1 - (((100 - self.weather) * 2) / float(100))  # 20% less demand for each 10 degrees below 100
         if price == 0:
             self.lemonade = 0  # If you set price to zero, all your lemonade sells, for nothing.
-            print('All of your lemonade sold for nothing because you set the price to zero.')
+            # print('All of your lemonade sold for nothing because you set the price to zero.')
             self.day += 1
             self.weather = random.randrange(50, 100)
         demand = int(round(cups * price_factor * heat_factor))
         if demand > self.lemonade:
-            print(
-                'You only have ' + str(self.lemonade) + ' cups of lemonade, but there was demand for ' + str(
-                    demand) + '.')
+            # print(
+            #     'You only have ' + str(self.lemonade) + ' cups of lemonade, but there was demand for ' + str(
+            #         demand) + '.')
             demand = self.lemonade
         revenue = demand * round((float(price) / 100), 2)
         self.lemonade -= demand
         self.cash += revenue
         self.day += 1
         self.weather = random.randrange(50, 100)
-        print('You sold ' + str(demand) + ' cup(s) of lemonade and earned $' + str(revenue) + ' dollars!\n')
+        # print('You sold ' + str(demand) + ' cup(s) of lemonade and earned $' + str(revenue) + ' dollars!\n')
         return demand
 
 
@@ -158,7 +158,7 @@ def disp_success(num):
     pg.display.update()
     pg.time.delay(1000)
     
-    message_display('Rewards:            x5', white, (200, 400))
+    message_display('Rewards:            x' + str(num), white, (200, 400))
     message_displaysmall('Each Lemon Makes 3-5 cups of Lemonade!!', white, (250, 450))
     lemon_img = pg.image.load('pics/lemon1.png').convert_alpha() 
     lemon_sz = lemon_img.get_size()
@@ -267,9 +267,11 @@ def main():
                     pass
                 if output == questions[x[i]][j][2]:
                     rewards = 5
+                    if x[i] == 3 and j == 1:
+                        rewards = 10
                     for rew in range(rewards):
                         stand.lemonade += random.randint(3,5)
-                    print "lemons: " + str(stand.lemonade)
+                    # print "lemons: " + str(stand.lemonade)
                     # testing
                     f.write(str(x[i]) + str(j) + str(hint_used) +  " Correct \n")
                     disp_success(rewards)
@@ -330,7 +332,7 @@ def main():
                         break
                     bg = pg.image.load(questions[x[i]][0][0]).convert()
                 else:
-                    print stand.lemonade
+                    # print stand.lemonade
                     done = True
                 output = None
 
